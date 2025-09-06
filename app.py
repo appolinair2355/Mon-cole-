@@ -5,8 +5,8 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill
 from models import Database
 
-# ⚠️ On dit à Flask que les templates (HTML) sont à la racine
-app = Flask(__name__, template_folder=".")
+# ✅ tout est à la racine (HTML + CSS)
+app = Flask(__name__, template_folder=".", static_folder=".")
 app.secret_key = os.getenv('SECRET_KEY', 'ecole_mont_sion_secret_key')
 db = Database()
 
@@ -238,7 +238,7 @@ def export_bilan_complet():
     return send_file(io_bytes, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                      as_attachment=True, download_name=f'bilan_administratif_{datetime.now():%Y%m%d_%H%M%S}.xlsx')
 
-# ---------- SAUVEGARDE / EXPORT / IMPORT ----------
+# ---------- SAUVEGARDE ----------
 @app.route('/sauvegarde')
 @require_auth
 def sauvegarde():
@@ -252,9 +252,6 @@ def sauvegarde():
 @app.route('/export_excel')
 @require_auth
 def export_excel():
-    import openpyxl
-    from openpyxl.styles import Font
-
     wb = openpyxl.Workbook()
     # Écoliers
     ws1 = wb.active
@@ -288,7 +285,6 @@ def import_excel():
             flash("Fichier invalide (besoin .xlsx)", "error")
             return redirect(url_for('import_excel'))
 
-        import openpyxl
         wb = openpyxl.load_workbook(file)
         # Écoliers
         if "Écoliers" in wb.sheetnames:
