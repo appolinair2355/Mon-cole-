@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="form-title">📝 Inscription</h2>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('ecolier')">Écolier (Maternelle - CM2)</button>
+        <button class="tab-btn" onclick="showTab('eleve')">Élève (6e - Terminale)</button>
+    </div>
+
+    <form id="form-ecolier" onsubmit="submitForm(event, 'ecolier')">
+        <input type="text" name="nom" placeholder="Nom" required>
+        <input type="text" name="prenoms" placeholder="Prénoms" required>
+        <select name="classe" required>
+            <option value="">Sélectionner la classe</option>
+            <option>Maternelle</option><option>CI</option><option>CP</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option>
+        </select>
+        <input type="text" name="nom_parent" placeholder="Nom du parent" required>
+        <input type="text" name="telephone" placeholder="Téléphone (01XXXXXXXX)" pattern="01[0-9]{8}" maxlength="10" required>
+        <input type="number" name="montant_scolarite" placeholder="Montant scolarité" min="0" required>
+        <button type="submit" class="btn">Inscrire écolier</button>
+    </form>
+
+    <form id="form-eleve" class="hidden" onsubmit="submitForm(event, 'eleve')">
+        <input type="text" name="nom" placeholder="Nom" required>
+        <input type="text" name="prenoms" placeholder="Prénoms" required>
+        <select name="classe" required>
+            <option value="">Sélectionner la classe</option>
+            <option>6ième</option><option>5ième</option><option>4ième</option><option>3ième</option><option>Seconde</option><option>Première</option><option>Terminale</option>
+        </select>
+        <input type="text" name="nom_parent" placeholder="Nom du parent" required>
+        <input type="text" name="telephone" placeholder="Téléphone (01XXXXXXXX)" pattern="01[0-9]{8}" maxlength="10" required>
+        <input type="number" name="montant_scolarite" placeholder="Montant scolarité" min="0" required>
+        <button type="submit" class="btn">Inscrire élève</button>
+    </form>
+</div>
+
+<script>
+function showTab(type){
+    document.getElementById('form-ecolier').classList.toggle('hidden', type !== 'ecolier');
+    document.getElementById('form-eleve').classList.toggle('hidden', type !== 'eleve');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+}
+async function submitForm(e, type){
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form));
+    const res = await fetch(`/inscrire_${type}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if(json.success){ alert('Inscription réussie !'); form.reset(); }
+    else{ alert(json.error || 'Erreur'); }
+}
+</script>
+</body>
+      </html>
+          
