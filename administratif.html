@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Administratif - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="form-title">🏢 Gestion budgétaire</h2>
+
+    <label>Grille des enseignants / niveaux / matières :</label>
+    <table id="tab-ens" class="table-small">
+        <thead><tr><th>Catégorie</th><th>Matière / Niveau</th><th>Montant (FCFA)</th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <button type="button" class="btn" onclick="remplirTableEnseignants()">Remplir la grille</button>
+
+    <div class="form-group">
+        <label for="frais_divers">Frais divers :</label>
+        <input type="number" id="frais_divers" min="0" placeholder="0">
+    </div>
+
+    <button type="button" class="btn" onclick="calculerBilan()">Calculer le bilan</button>
+
+    <div id="box-result" style="display:none; margin-top:20px;">
+        <h3>Récapitulatif (FCFA)</h3>
+        <ul id="liste-bilan"></ul>
+        <button class="btn" onclick="exporterBilan()">Exporter Excel</button>
+    </div>
+</div>
+
+<script>
+const grille = [
+  {cat:'Maternelle',label:'Maternelle'},{cat:'Maternelle',label:'CI'},
+  {cat:'CP'},{cat:'CE1'},{cat:'CE2'},{cat:'CM1'},{cat:'CM2'},
+  {cat:'Professeur',label:'Mathématiques'},{cat:'Professeur',label:'Physique'},
+  {cat:'Professeur',label:'Anglais'},{cat:'Professeur',label:'Histoire-Géographie'},
+  {cat:'Professeur',label:'SVT'},{cat:'Professeur',label:'Espagnol'},
+  {cat:'Professeur',label:'EPS'},{cat:'Professeur',label:'Français'}
+];
+function remplirTableEnseignants(){
+  const tbody = document.querySelector('#tab-ens tbody');
+  tbody.innerHTML='';
+  grille.forEach(g=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${g.cat}</td><td>${g.label||''}</td><td><input type="number" class="montant-ens" min="0" data-cat="${g.cat}" data-label="${g.label||''}" value="0"></td>`;
+    tbody.appendChild(tr);
+  });
+}
+async function calculerBilan(){
+  let totalEns = 0; document.querySelectorAll('.montant-ens').forEach(i=> totalEns += parseFloat(i.value)||0);
+  const fraisDiv = parseFloat(document.getElementById('frais_divers').value)||0;
+  const r = await fetch('/api/bilan_admin'); const auto = await r.json();
+  const disponible = auto.total_scolarite_payee - fraisDiv - totalEns;
+  const box = document.getElementById('box-result'); box.style.display = 'block';
+  document.getElementById('liste-bilan').innerHTML = `
+    <li><strong>Total scolarité DUE :</strong> ${auto.total_scolarite_due.toLocaleString()}</li>
+    <li><strong>Total scolarité PAYÉE :</strong> ${auto.total_scolarite_payee.toLocaleString()}</li>
+    <li><strong>Total payé aux enseignants :</strong> ${totalEns.toLocaleString()}</li>
+    <li><strong>Frais divers :</strong> ${fraisDiv.toLocaleString()}</li>
+    <li style="color:#00ff88;"><strong>RESTANT :</strong> ${disponible.toLocaleString()}</li>`;
+  box.dataset.bilan = JSON.stringify({total_due:auto.total_scolarite_due,total_payee:auto.total_scolarite_payee,total_ens:totalEns,frais_div:fraisDiv,restant:disponible});
+}
+async function exporterBilan(){
+  const bil = JSON.parse(document.getElementById('box-result').dataset.bilan||'{}');
+  if(!bil.total_payee){ alert('Rien à exporter'); return; }
+  const res = await fetch('/export_bilan_complet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bil)});
+  const blob = await res.blob(); const url = window.URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = `bilan_administratif_${new Date().toISOString().slice(0,10)}.xlsx`; a.click();
+}
+</script>
+</body>
+</html>
