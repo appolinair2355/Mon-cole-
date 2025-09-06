@@ -5,7 +5,8 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill
 from models import Database
 
-app = Flask(__name__)
+# ⚠️ On dit à Flask que les templates (HTML) sont à la racine
+app = Flask(__name__, template_folder=".")
 app.secret_key = os.getenv('SECRET_KEY', 'ecole_mont_sion_secret_key')
 db = Database()
 
