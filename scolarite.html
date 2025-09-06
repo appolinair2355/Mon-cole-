@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Scolarité - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="table-container">
+    <h2>💰 Gestion de la Scolarité</h2>
+    <table id="table-scolarite">
+        <thead>
+            <tr><th>Nom</th><th>Prénoms</th><th>Classe</th><th>Montant dû</th><th>Déjà payé</th><th>Reste</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr data-id="{{ s.id }}" data-type="{{ 'ecolier' if s in ecoliers else 'eleve' }}">
+                <td>{{ s.nom }}</td>
+                <td>{{ s.prenoms }}</td>
+                <td>{{ s.classe }}</td>
+                <td>{{ s.montant_scolarite }} FCFA</td>
+                <td class="paye">{{ s.total_paid }} FCFA</td>
+                <td class="reste">{{ s.reste }} FCFA</td>
+                <td><button onclick="ouvrirPaiement('{{ s.id }}', '{{ 'ecolier' if s in ecoliers else 'eleve' }}')">Payer</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="modal-paiement" class="modal hidden">
+    <div class="modal-content">
+        <span onclick="fermerPaiement()" class="close">&times;</span>
+        <h3>Effectuer un paiement</h3>
+        <input type="number" id="montant-paiement" placeholder="Montant" min="1">
+        <button onclick="validerPaiement()">Valider</button>
+    </div>
+</div>
+
+<script>
+let currentId = null, currentType = null;
+function ouvrirPaiement(id, type){ currentId = id; currentType = type; document.getElementById('modal-paiement').classList.remove('hidden'); }
+function fermerPaiement(){ document.getElementById('modal-paiement').classList.add('hidden'); }
+async function validerPaiement(){
+    const montant = parseInt(document.getElementById('montant-paiement').value);
+    if(!montant || montant <= 0){ alert('Montant invalide'); return; }
+    const res = await fetch('/paiement', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({student_id:currentId, student_type:currentType, amount:montant})
+    });
+    const data = await res.json();
+    if(data.success){
+        const row = document.querySelector(`tr[data-id="${currentId}"][data-type="${currentType}"]`);
+        row.querySelector('.paye').textContent = data.total_paid + ' FCFA';
+        row.querySelector('.reste').textContent = data.reste + ' FCFA';
+        fermerPaiement();
+    }else{ alert('Erreur'); }
+}
+</script>
+</body>
+</html>
