@@ -147,4 +147,40 @@ th {
         flex-direction: column;
         gap: 10px;
     }
-  }
+}
+
+/* ===== BOUTONS ACCUEIL (effet verre) ===== */
+.buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.home-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.home-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.home-btn i {
+    font-size: 2em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.home-btn span {
+    font-size: 1.1em;
+    }
+    
