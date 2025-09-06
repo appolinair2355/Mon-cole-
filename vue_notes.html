@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Voir Notes - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="form-container">
+    <h2>📊 Consultation des Notes</h2>
+    <div class="form-group">
+        <label>Classe :</label>
+        <select id="classe" onchange="chargerNotes()">
+            <option value="">Toutes</option>
+            {% for c in classes %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Matière :</label>
+        <select id="matiere" onchange="chargerNotes()">
+            <option value="">Toutes</option>
+            {% for m in matieres %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+        </select>
+    </div>
+    <div id="table-notes"></div>
+</div>
+
+<script>
+async function chargerNotes(){
+    const classe = document.getElementById('classe').value;
+    const matiere = document.getElementById('matiere').value;
+    const res = await fetch('/get_all_notes', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({classe, matiere})
+    });
+    const data = await res.json();
+    const div = document.getElementById('table-notes');
+    if(!data.notes.length){ div.innerHTML = '<p>Aucune note.</p>'; return; }
+    let html = '<table><thead><tr><th>Élève</th><th>Classe</th><th>Matière</th><th>Note</th><th>Date</th></tr></thead><tbody>';
+    data.notes.forEach(n => {
+        html += `<tr><td>${n.student_name}</td><td>${n.classe}</td><td>${n.matiere}</td><td>${n.note}</td><td>${n.date}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    div.innerHTML = html;
+}
+</script>
+</body>
+</html>
