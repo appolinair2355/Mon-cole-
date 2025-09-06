@@ -1,63 +1,56 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Accueil - École Mont Sion de Bapkerou</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</head>
-<body>
-<div class="container">
-    <div class="school-name">
-        <span class="animate-text">École 🏫 Mont Sion de Bapkerou</span>
-    </div>
+{% extends "base.html" %}
 
-    <div class="buttons-grid">
-        <a href="{{ url_for('inscription') }}" class="btn">
-            <i class="fas fa-user-plus"></i>
-            <span>Inscriptions</span>
-        </a>
+{% block title %}Accueil - École Mont Sion de Bapkerou{% endblock %}
 
-        <a href="{{ url_for('liste_eleves') }}" class="btn">
-            <i class="fas fa-list"></i>
-            <span>Liste Élèves</span>
-        </a>
-
-        <a href="{{ url_for('liste_ecoliers') }}" class="btn">
-            <i class="fas fa-graduation-cap"></i>
-            <span>Liste Écoliers</span>
-        </a>
-
-        <a href="{{ url_for('scolarite') }}" class="btn">
-            <i class="fas fa-money-bill-wave"></i>
-            <span>Gestion Scolarité</span>
-        </a>
-
-        <a href="{{ url_for('notes') }}" class="btn">
-            <i class="fas fa-star"></i>
-            <span>Saisie Notes</span>
-        </a>
-
-        <a href="{{ url_for('vue_notes') }}" class="btn">
-            <i class="fas fa-chart-bar"></i>
-            <span>Voir Notes</span>
-        </a>
-
-        <a href="{{ url_for('sauvegarde') }}" class="btn">
-            <i class="fas fa-download"></i>
-            <span>Sauvegarder & Importer</span>
-        </a>
-
-        <a href="{{ url_for('moyenne') }}" class="btn">
-            <i class="fas fa-calculator"></i>
-            <span>Moyenne</span>
-        </a>
-
-        <a href="{{ url_for('administratif') }}" class="btn">
-            <i class="fas fa-cogs"></i>
-            <span>Administratif</span>
-        </a>
-    </div>
+{% block content %}
+<div class="school-name">
+    <span class="animate-text">École 🏫 Mont Sion de Bapkerou</span>
 </div>
-</body>
-</html>
+
+<div class="buttons-grid">
+    <a href="{{ url_for('inscription') }}" class="home-btn">
+        <i class="fas fa-user-plus"></i>
+        <span>Inscriptions</span>
+    </a>
+
+    <a href="{{ url_for('liste_eleves') }}" class="home-btn">
+        <i class="fas fa-list"></i>
+        <span>Liste Élèves</span>
+    </a>
+
+    <a href="{{ url_for('liste_ecoliers') }}" class="home-btn">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Liste Écoliers</span>
+    </a>
+
+    <a href="{{ url_for('scolarite') }}" class="home-btn">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Gestion Scolarité</span>
+    </a>
+
+    <a href="{{ url_for('notes') }}" class="home-btn">
+        <i class="fas fa-star"></i>
+        <span>Saisie Notes</span>
+    </a>
+
+    <a href="{{ url_for('vue_notes') }}" class="home-btn">
+        <i class="fas fa-chart-bar"></i>
+        <span>Voir Notes</span>
+    </a>
+
+    <a href="{{ url_for('sauvegarde') }}" class="home-btn">
+        <i class="fas fa-download"></i>
+        <span>Sauvegarder & Importer</span>
+    </a>
+
+    <a href="{{ url_for('moyenne') }}" class="home-btn">
+        <i class="fas fa-calculator"></i>
+        <span>Moyenne</span>
+    </a>
+
+    <a href="{{ url_for('administratif') }}" class="home-btn">
+        <i class="fas fa-cogs"></i>
+        <span>Administratif</span>
+    </a>
+</div>
+{% endblock %}
