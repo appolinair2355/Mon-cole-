@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Moyenne - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="form-container">
+  <h2 class="form-title">🔢 Calcul des Moyennes (Notes 0-99)</h2>
+  <div class="form-group"><label>Classe :</label>
+    <select id="classe"><option value="">Sélectionner</option>
+      {% for c in classes_ecoliers + classes_eleves %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="form-group"><label>Nom du PP :</label><input type="text" id="pp_nom" placeholder="Ex: Mr Arrow"></div>
+  <div class="form-group"><label>Diviseur :</label><input type="number" id="diviseur" min="1" placeholder="10"></div>
+  <button class="btn" onclick="calculerMoyenne()">Calculer</button>
+
+  <div id="result-container" style="display:none; margin-top:20px;"><h3>Résultat</h3>
+    <div id="result-header"></div><div id="result-list"></div>
+    <button class="btn" onclick="exporterMoyennes()">Exporter Excel</button>
+  </div>
+  <div id="error-message" style="display:none; color:#ff416c;"></div>
+</div>
+
+<script>
+async function calculerMoyenne(){
+  const cls=document.getElementById('classe').value, pp=document.getElementById('pp_nom').value, div=document.getElementById('diviseur').value;
+  if(!cls||!pp||!div){alert('Remplir tous les champs');return;}
+  const res=await fetch('/calculer_moyenne',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({classe:cls,pp_nom:pp,diviseur:parseInt(div)})});
+  const data=await res.json();
+  if(data.success){afficherResultat(data);}
+  else{document.getElementById('error-message').style.display='block';document.getElementById('error-message').textContent='Erreur lors du calcul.';}
+}
+function afficherResultat(data){
+  document.getElementById('result-container').style.display='block';
+  document.getElementById('error-message').style.display='none';
+  document.getElementById('result-header').textContent=`📊 Moyenne - ${data.classe} - PP : ${data.pp_nom} - Diviseur : ${data.diviseur} - Effectif : ${data.effectif}`;
+  const list=document.getElementById('result-list');
+  list.innerHTML=''; list.dataset.resultats=JSON.stringify(data.resultats);
+  data.resultats.forEach(res=>{
+    const rangTxt=res.rang===1?'1er':res.rang===2?'2e':res.rang===3?'3e':`${res.rang}e`;
+    list.innerHTML+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);"><span>${res.nom} ${res.prenoms}</span><span>${res.moyenne}</span><span>${rangTxt}</span></div>`;
+  });
+}
+async function exporterMoyennes(){
+  const data={resultats:JSON.parse(document.getElementById('result-list').dataset.resultats||'[]'),classe:document.getElementById('classe').value,pp_nom:document.getElementById('pp_nom').value,diviseur:document.getElementById('diviseur').value};
+  if(!data.resultats.length){alert('Aucun résultat');return;}
+  const res=await fetch('/export_moyennes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const blob=await res.blob(), url=window.URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=`moyennes_${data.classe}_${new Date().toISOString().slice(0,10)}.xlsx`; a.click();
+}
+</script>
+</body>
+</html>
