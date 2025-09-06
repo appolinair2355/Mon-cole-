@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sauvegarde - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="form-title">
+        <i class="fas fa-download"></i>
+        Sauvegarde & Import / Export
+    </h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div style="display: grid; gap: 20px;">
+        <a href="{{ url_for('export_excel') }}" class="btn">
+            <i class="fas fa-file-excel"></i>
+            <span>Exporter vers Excel</span>
+        </a>
+
+        <a href="{{ url_for('import_excel') }}" class="btn">
+            <i class="fas fa-file-import"></i>
+            <span>Importer depuis Excel</span>
+        </a>
+
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+            <h3>Statistiques</h3>
+            <p><strong>Écoliers :</strong> {{ stats.ecoliers }}</p>
+            <p><strong>Élèves :</strong> {{ stats.eleves }}</p>
+            <p><strong>Notes :</strong> {{ stats.notes }}</p>
+        </div>
+</div>
+</body>
+</html>
