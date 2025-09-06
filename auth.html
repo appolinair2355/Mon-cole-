@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentification - École Mont Sion</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: Arial, sans-serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .auth-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .auth-title {
+            font-size: 2em;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            color: #ff416c;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: rgba(255, 65, 108, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .btn {
+            background: #ffcc00;
+            color: #1e3c72;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #ffd633;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        <h2 class="auth-title">🔒 Authentification</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('verifier') }}">
+            <input type="hidden" name="next_page" value="{{ next_page }}">
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <button type="submit" class="btn">Se connecter</button>
+        </form>
+    </div>
+</body>
+  </html>
+  
