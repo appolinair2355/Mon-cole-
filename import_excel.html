@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Importer Excel - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="form-title">
+        <i class="fas fa-file-import"></i>
+        Importer des données Excel
+    </h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('import_excel') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Sélectionner un fichier Excel (.xlsx)</label>
+            <input type="file" name="file" id="file" accept=".xlsx" required>
+        </div>
+
+        <button type="submit" class="btn">
+            <i class="fas fa-upload"></i> Importer
+        </button>
+    </form>
+
+    <div style="margin-top: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+        <h4>Format attendu :</h4>
+        <ul>
+            <li><strong>Onglets :</strong> Écoliers, Élèves, Notes</li>
+            <li><strong>Colonnes :</strong> Nom, Prénoms, Classe, Note, etc.</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
