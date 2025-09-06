@@ -331,17 +331,6 @@ def import_excel():
         return redirect(url_for('sauvegarde'))
     return render_template('import_excel.html')
 
-# ---------- SAUVEGARDE ----------
-@app.route('/sauvegarde')
-@require_auth
-def sauvegarde():
-    stats = {
-        'ecoliers': len(db.get_ecoliers()),
-        'eleves': len(db.get_eleves()),
-        'notes': len(db.get_notes())
-    }
-    return render_template('sauvegarde.html', stats=stats)
-
 # ---------- DEMO ----------
 @app.route('/sauvegarde_demo')
 def sauvegarde_demo():
@@ -351,4 +340,3 @@ def sauvegarde_demo():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
-  
