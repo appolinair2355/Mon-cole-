@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Saisie des Notes - École Mont Sion{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">📝 Saisie des Notes (0-99)</h2>
+
+    <div class="form-group">
+        <label for="type_student">Type d'étudiant</label>
+        <select id="type_student" onchange="updateClassOptions()" style="background:#fff; color:#000; font-size:1.2em; padding:10px;">
+            <option value="">Sélectionner</option>
+            <option value="ecolier">Écolier</option>
+            <option value="eleve">Élève</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="classe">Classe</label>
+        <select id="classe" onchange="loadStudents()" style="background:#fff; color:#000; font-size:1.2em; padding:10px;">
+            <option value="">Sélectionner</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="matiere">Matière</label>
+        <select id="matiere" onchange="displayStudents()" style="background:#fff; color:#000; font-size:1.2em; padding:10px;">
+            <option value="">Sélectionner</option>
+        </select>
+    </div>
+
+    <div id="students-container"></div>
+
+    <button type="button" class="btn" onclick="saveNotes()" style="background:#ff416c; color:#fff; font-size:1.3em; padding:15px 30px;">Enregistrer les notes</button>
+
+    <div id="success-message" style="display:none; color:#00ff88; font-weight:bold; margin-top:20px;">
+        ✅ Notes enregistrées avec succès !
+    </div>
+</div>
+
+<script>
+let currentStudents = [];
+
+function updateClassOptions() {
+    const type = document.getElementById('type_student').value;
+    const classeSelect = document.getElementById('classe');
+    const matiereSelect = document.getElementById('matiere');
+    
+    classeSelect.innerHTML = '<option value="">Sélectionner</option>';
+    matiereSelect.innerHTML = '<option value="">Sélectionner</option>';
+    
+    if (type === 'ecolier') {
+        const classes = ['maternelle', 'CI', 'CP', 'CE1', 'CE2', 'CM1', 'CM2'];
+        classes.forEach(classe => {
+            classeSelect.innerHTML += `<option value="${classe}">${classe}</option>`;
+        });
+    } else if (type === 'eleve') {
+        const classes = ['6ième', '5ième', '4ième', '3ième', 'Seconde', 'Première', 'Terminale'];
+        classes.forEach(classe => {
+            classeSelect.innerHTML += `<option value="${classe}">${classe}</option>`;
+        });
+    }
+    
+    document.getElementById('students-container').innerHTML = '';
+}
+
+function updateMatiereOptions() {
+    const classe = document.getElementById('classe').value;
+    const matiereSelect = document.getElementById('matiere');
+    const matieres = {{ matieres | tojson }};
+    
+    matiereSelect.innerHTML = '<option value="">Sélectionner</option>';
+    matieres.forEach(matiere => {
+        matiereSelect.innerHTML += `<option value="${matiere}">${matiere}</option>`;
+    });
+}
+
+function loadStudents() {
+    const classe = document.getElementById('classe').value;
+    const isEcolier = document.getElementById('type_student').value === 'ecolier';
+    
+    if (!classe) return;
+    
+    fetch('/get_students_by_class', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ classe: classe, is_ecolier: isEcolier })
+    })
+    .then(response => response.json())
+    .then(data => {
+        currentStudents = data.students;
+        displayStudents();
+    });
+}
+
+function displayStudents() {
+    const container = document.getElementById('students-container');
+    const matiere = document.getElementById('matiere').value;
+    
+    if (!matiere || currentStudents.length === 0) {
+        container.innerHTML = '<p>Aucun élève dans cette classe</p>';
+        return;
+    }
+    
+    let html = '<table><thead><tr><th>Nom</th><th>Prénoms</th><th>Note (' + matiere + ')</th></tr></thead><tbody>';
+    
+    currentStudents.forEach(student => {
+        html += `
+            <tr>
+                <td>${student.nom}</td>
+                <td>${student.prenoms}</td>
+                <td>
+                    <input type="number" min="0" max="99" step="0.1" class="note-input" 
+                           data-student-id="${student.id}" data-student-type="${document.getElementById('type_student').value}" 
+                           value="${student.note || ''}" style="background:#fff; color:#000; width:80px;">
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function saveNotes() {
+    const classe = document.getElementById('classe').value;
+    const matiere = document.getElementById('matiere').value;
+    const isEcolier = document.getElementById('type_student').value === 'ecolier';
+    
+    const notes = [];
+    document.querySelectorAll('.note-input').forEach(input => {
+        if (input.value) {
+            notes.push({
+                student_id: parseInt(input.dataset.studentId),
+                student_type: input.dataset.studentType,
+                classe: classe,
+                matiere: matiere,
+                note: input.value
+            });
+        }
+    });
+    
+    if (notes.length === 0) {
+        alert('Aucune note à enregistrer');
+        return;
+    }
+    
+    fetch('/save_notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: notes })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('success-message').style.display = 'block';
+            displayStudents(); // Rafraîchir pour voir les nouvelles notes
+        }
+    });
+}
+
+document.getElementById('classe').addEventListener('change', function() {
+    if (this.value) {
+        updateMatiereOptions();
+        loadStudents();
+    }
+});
+</script>
+{% endblock %}
+              
