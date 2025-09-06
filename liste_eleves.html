@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste Élèves - École Mont Sion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="table-container">
+    <h2>📋 Liste des Élèves</h2>
+    <table>
+        <thead>
+            <tr><th>Nom</th><th>Prénoms</th><th>Classe</th><th>Montant</th><th>Téléphone</th></tr>
+        </thead>
+        <tbody>
+            {% for e in eleves %}
+            <tr>
+                <td>{{ e.nom }}</td>
+                <td>{{ e.prenoms }}</td>
+                <td>{{ e.classe }}</td>
+                <td>{{ e.montant_scolarite }} FCFA</td>
+                <td>{{ e.telephone }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
